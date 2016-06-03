@@ -2,6 +2,7 @@ package com.ase_lab.erwear_reconclient;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
 
@@ -11,6 +12,11 @@ import com.reconinstruments.os.metrics.HUDMetricsManager;
 import com.reconinstruments.os.metrics.MetricsValueChangedListener;
 import android.app.Notification;
 import android.app.NotificationManager;
+
+import io.socket.*;
+import org.json.*;
+
+import java.net.MalformedURLException;
 
 public class MainActivity extends Activity implements MetricsValueChangedListener
 {
@@ -25,6 +31,8 @@ public class MainActivity extends Activity implements MetricsValueChangedListene
 
     float startPressure = Float.MIN_VALUE;
 
+
+    SocketIO socket;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -46,6 +54,53 @@ public class MainActivity extends Activity implements MetricsValueChangedListene
         super.onResume();
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.ALTITUDE_PRESSURE);
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.SPEED_VERTICAL);
+
+        try{
+            socket = new SocketIO("http://127.0.0.1:3000/");
+        }catch(MalformedURLException e){
+            System.out.println(e.toString());
+            Log.e("ERWear Exception","Malformed URL Error");
+        }
+
+        socket.connect(new IOCallback() {
+            @Override
+            public void onMessage(JSONObject json, IOAcknowledge ack) {
+                try {
+                    System.out.println("Server said:" + json.toString(2));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onMessage(String data, IOAcknowledge ack) {
+                System.out.println("Server said: " + data);
+            }
+
+            @Override
+            public void onError(SocketIOException socketIOException) {
+                System.out.println("an Error occured");
+                socketIOException.printStackTrace();
+            }
+
+            @Override
+            public void onDisconnect() {
+                System.out.println("Connection terminated.");
+            }
+
+            @Override
+            public void onConnect() {
+                System.out.println("Connection established");
+            }
+
+            @Override
+            public void on(String event, IOAcknowledge ack, Object... args) {
+                System.out.println("Server triggered event '" + event + "'");
+            }
+        });
+
+        // This line is cached until the connection is establisched.
+        socket.send("Hello Server!");
     }
 
     @Override
