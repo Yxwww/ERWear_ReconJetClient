@@ -56,7 +56,8 @@ public class MainActivity extends Activity implements MetricsValueChangedListene
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.SPEED_VERTICAL);
 
         try{
-            socket = new SocketIO("http://127.0.0.1:3000/");
+            // TODO: Add network permission to manifest file
+            socket = new SocketIO("http://192.168.0.136:3000/");
         }catch(MalformedURLException e){
             System.out.println(e.toString());
             Log.e("ERWear Exception","Malformed URL Error");
