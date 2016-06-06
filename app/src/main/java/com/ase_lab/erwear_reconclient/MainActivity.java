@@ -1,24 +1,34 @@
 package com.ase_lab.erwear_reconclient;
 
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.widget.TextView;
+import android.content.Intent;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 
 import com.reconinstruments.os.HUDOS;
 import com.reconinstruments.os.metrics.HUDMetricsID;
 import com.reconinstruments.os.metrics.HUDMetricsManager;
 import com.reconinstruments.os.metrics.MetricsValueChangedListener;
+import com.reconinstruments.ui.list.SimpleListActivity;
+
 import android.app.Notification;
 import android.app.NotificationManager;
+
 
 import io.socket.*;
 import org.json.*;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 
-public class MainActivity extends Activity implements MetricsValueChangedListener
+public class MainActivity extends SimpleListActivity implements MetricsValueChangedListener
 {
     HUDMetricsManager mHUDMetricsManager;
     NotificationManager mNotificationManager;
@@ -55,14 +65,21 @@ public class MainActivity extends Activity implements MetricsValueChangedListene
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.ALTITUDE_PRESSURE);
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.SPEED_VERTICAL);
 
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("google.navigation:q=51.080018013294136,-114.12513971328735"));
+        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+
         try{
-            // TODO: Add network permission to manifest file
-            socket = new SocketIO("http://192.168.0.136:3000/");
+            socket = new SocketIO("http://192.168.1.73:3000/");
         }catch(MalformedURLException e){
             System.out.println(e.toString());
             Log.e("ERWear Exception","Malformed URL Error");
         }
 
+
+        // SOD Evetnts
         socket.connect(new IOCallback() {
             @Override
             public void onMessage(JSONObject json, IOAcknowledge ack) {

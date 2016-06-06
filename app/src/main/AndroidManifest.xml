@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ase_lab.erwear_reconclient">
-
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-library android:name="com.reconinstruments.os" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -20,6 +24,8 @@
         </activity>
         <uses-library android:name="com.reconinstruments.os"/>
         <uses-library android:name="com.reconinstruments.lib"/>
+        <uses-library android:name="com.reconinstruments.lib" />
+        <uses-library android:name="com.reconinstruments.os" />
     </application>
 
 </manifest>
