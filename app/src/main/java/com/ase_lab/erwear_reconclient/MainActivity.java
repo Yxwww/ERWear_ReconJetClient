@@ -1,7 +1,5 @@
 package com.ase_lab.erwear_reconclient;
 
-import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -10,7 +8,6 @@ import android.content.Intent;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 
 import com.reconinstruments.os.HUDOS;
 import com.reconinstruments.os.metrics.HUDMetricsID;
@@ -18,21 +15,15 @@ import com.reconinstruments.os.metrics.HUDMetricsManager;
 import com.reconinstruments.os.metrics.MetricsValueChangedListener;
 import com.reconinstruments.ui.list.SimpleListActivity;
 import android.view.KeyEvent;
-import android.widget.TextView;
 import android.media.AudioManager;
-
-import android.app.Notification;
-import android.app.NotificationManager;
 
 
 import io.socket.*;
 import org.json.*;
 
 import java.net.MalformedURLException;
-import java.net.URI;
 
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 //import com.google.android.gms.common.api.GoogleApiClient.;
 
 public class MainActivity extends SimpleListActivity implements MetricsValueChangedListener
@@ -83,7 +74,7 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
 
         altitudeTextView = (TextView) findViewById(R.id.altitudeTextView);
 
-        speedVrtTextView = (TextView) findViewById(R.id.speedTextView);
+        speedVrtTextView = (TextView) findViewById(R.id.speedTextViewGMap);
         nameTextView = (TextView) findViewById(R.id.nameTextView);
         nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
         //altitudeTextView.getLayout.setMargins(50, 0, 0, 0);
@@ -116,7 +107,7 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
 
 
 
-        try{
+        /*try{
             socket = new SocketIO("http://192.168.1.73:3000/");
         }catch(MalformedURLException e){
             System.out.println(e.toString());
@@ -161,7 +152,7 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
             public void on(String event, IOAcknowledge ack, Object... args) {
                 System.out.println("Server triggered event '" + event + "'");
             }
-        });
+        });*/
 
         // This line is cached until the connection is establisched.
         //socket.send("Hello Server!");

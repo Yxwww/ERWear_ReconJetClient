@@ -59,11 +59,11 @@
             android:layout_weight="0"
             android:layout_gravity="center_horizontal"
             android:layout_alignParentTop="true"
-            android:layout_toLeftOf="@+id/speedTextView"
+            android:layout_toLeftOf="@+id/speedTextViewGMap"
             android:layout_marginRight="5dp" />
 
         <TextView
-            android:id="@+id/speedTextView"
+            android:id="@+id/speedTextViewGMap"
             android:text="speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
