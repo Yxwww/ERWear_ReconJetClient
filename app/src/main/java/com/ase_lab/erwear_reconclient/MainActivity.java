@@ -17,6 +17,9 @@ import com.reconinstruments.os.metrics.HUDMetricsID;
 import com.reconinstruments.os.metrics.HUDMetricsManager;
 import com.reconinstruments.os.metrics.MetricsValueChangedListener;
 import com.reconinstruments.ui.list.SimpleListActivity;
+import android.view.KeyEvent;
+import android.widget.TextView;
+import android.media.AudioManager;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -28,6 +31,10 @@ import org.json.*;
 import java.net.MalformedURLException;
 import java.net.URI;
 
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
+//import com.google.android.gms.common.api.GoogleApiClient.;
+
 public class MainActivity extends SimpleListActivity implements MetricsValueChangedListener
 {
     HUDMetricsManager mHUDMetricsManager;
@@ -35,14 +42,39 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
 
     TextView altitudeTextView;
     TextView speedVrtTextView;
+    TextView nameTextView;
 
     float altitudePressure = 0;
     float speedVertical    = 0;
 
     float startPressure = Float.MIN_VALUE;
 
+    private GoogleApiClient mGoogleApiClient;
 
     SocketIO socket;
+    AudioManager audioManager = null;
+    public String TAG = "ERWear";
+    public String ResponderName = "John-117";
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        Log.v(TAG, "onKeyDown keyCode: " + keyCode);
+        switch(keyCode)
+        {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+
+                return true;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                //doStuff("SELECT", AudioManager.FX_KEYPRESS_RETURN);
+                audioManager.playSoundEffect(AudioManager.FX_KEYPRESS_RETURN, 1);
+                Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
+                startActivity(mapIntent);
+
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -52,10 +84,15 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
         altitudeTextView = (TextView) findViewById(R.id.altitudeTextView);
 
         speedVrtTextView = (TextView) findViewById(R.id.speedTextView);
-        speedVrtTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 52);
+        nameTextView = (TextView) findViewById(R.id.nameTextView);
+        nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
+        //altitudeTextView.getLayout.setMargins(50, 0, 0, 0);
+        //speedVrtTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 52);
 
         mHUDMetricsManager   = (HUDMetricsManager) HUDOS.getHUDService(HUDOS.HUD_METRICS_SERVICE);
         mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+
+        audioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
     }
 
     @Override
@@ -66,10 +103,18 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
         mHUDMetricsManager.registerMetricsListener(this, HUDMetricsID.SPEED_VERTICAL);
 
 
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+        // UI Init
+        nameTextView.setText(String.format("John-117"));
+
+        /*Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse("google.navigation:q=51.080018013294136,-114.12513971328735"));
-        //intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);*/
+
+        //TODO: Correctly follow the google map API signin footsetup https://developers.google.com/places/android-api/signup#release-cert https://developer.android.com/studio/publish/app-signing.html
+
+
+
 
         try{
             socket = new SocketIO("http://192.168.1.73:3000/");
@@ -118,7 +163,7 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
         });
 
         // This line is cached until the connection is establisched.
-        socket.send("Hello Server!");
+        //socket.send("Hello Server!");
     }
 
     @Override
@@ -146,8 +191,8 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
 
         if(Math.abs(startPressure - altitudePressure) > 2)
         {
-            if(startPressure != Float.MIN_VALUE){ CreateNotification(); }
-            startPressure = altitudePressure;
+            //if(startPressure != Float.MIN_VALUE){ CreateNotification(); }
+            //startPressure = altitudePressure;
         }
     }
 
