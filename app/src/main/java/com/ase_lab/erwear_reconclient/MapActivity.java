@@ -129,6 +129,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
                 } catch (JSONException e) {
                     e.printStackTrace();
+                    System.out.println("OnMessage Json Exception: "+e.toString());
                 }
             }
 
@@ -156,6 +157,24 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
             @Override
             public void on(String event, IOAcknowledge ack, Object... args) {
                 System.out.println("Server triggered event '" + event + "'");
+                try{
+                    switch(event){
+                        case "POIUpdate":
+                            System.out.println("POI Update YO! '" + event + "'");
+                            JSONObject data = (JSONObject)args[0];
+                            System.out.println(data.getString("description"));
+                            Notification notification = new Notification.Builder(getApplicationContext())
+                                    .setContentTitle("POI Update")
+                                    .setSmallIcon(R.drawable.icon_checkmark)
+                                    .setContentText(data.getString("description"))
+                                    .build();
+                            mNotificationManager.notify(0, notification);
+                            break;
+                    }
+                }catch(JSONException e){
+                    Log.e("ERWear", e.toString());
+                }
+
             }
         });
 
@@ -171,7 +190,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
 
         LatLng current_location = new LatLng(51.071099, -114.128332);
-        Log.d("ERWear","!!"+current_location.toString());
+        Log.d("ERWear", "!!" + current_location.toString());
         mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
@@ -182,7 +201,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));*/
-        Log.d("ERWear","MapReady");
+        Log.d("ERWear", "MapReady");
         // Acquire a reference to the system Location Manager
         /*LocationManager locationManager = (LocationManager) this.getSystemService(getApplicationContext().LOCATION_SERVICE);
 
@@ -208,5 +227,17 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback 
 
 // Register the listener with the Location Manager to receive location updates
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);*/
+    }
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+
+        // Release the Camera because we don't need it when paused
+        // and other activities might need to use it.
+        if(this.socket !=null){
+            if (this.socket.isConnected()) {
+                this.socket.disconnect();
+            }
+        }
+
     }
 }

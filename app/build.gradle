@@ -29,5 +29,5 @@ dependencies {
     compile 'com.reconinstruments.ui:recon-ui:4.4.0'
     provided 'com.reconinstruments.os:recon-platform:4.4.0'
     compile files('libs/socketio.jar')
-    compile 'com.google.android.gms:play-services:9.0.2'
+    compile 'com.google.android.gms:play-services-maps:9.0.2'
 }

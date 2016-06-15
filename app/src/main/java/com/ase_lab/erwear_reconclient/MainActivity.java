@@ -51,7 +51,7 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
 
     private GoogleApiClient mGoogleApiClient;
 
-    SocketIO socket;
+    SocketIO socket = null;
     AudioManager audioManager = null;
     public String TAG = "ERWear";
     public String ResponderName = "John-117";
@@ -124,7 +124,8 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
         }
 
 
-        // SOD Evetnts
+        // SOD Events
+        Log.d("ERWear","!!"+socket.toString());
         socket.connect(new IOCallback() {
             @Override
             public void onMessage(JSONObject json, IOAcknowledge ack) {
