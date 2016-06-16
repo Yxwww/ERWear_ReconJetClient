@@ -53,7 +53,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     AudioManager audioManager = null;
-    String TAG = "ERWear";
+    String TAG = "ERWear_MapView";
     //Load animation
     Animation slide_down = null;
     Animation slide_up = null;
@@ -99,11 +99,13 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void onAnimationStart(Animation arg0) {
                 //Functionality here
+                ERWearConsoleLinearLayout.setVisibility(View.VISIBLE);
             }
             @Override
             public void onAnimationEnd(Animation arg0) {
                 //Functionality here
                 ERWearConsoleLinearLayout.setAlpha(1.0f);
+
             }
             @Override
             public void onAnimationRepeat(Animation arg0) {
@@ -120,6 +122,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             public void onAnimationEnd(Animation arg0) {
                 //Functionality here
                 ERWearConsoleLinearLayout.setAlpha(0.1f);
+                ERWearConsoleLinearLayout.setVisibility(View.INVISIBLE);
             }
             @Override
             public void onAnimationRepeat(Animation arg0) {
@@ -138,50 +141,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         //nameTextView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 20);
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event)
-    {
-        Log.v(TAG, "onKeyDown keyCode: " + keyCode);
-        switch(keyCode)
-        {
-            case KeyEvent.KEYCODE_DPAD_LEFT:
-                Log.d(TAG, "interactive(centre)");
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(Settings.ACTION_SETTINGS), 0);
-                Notification notification = new Notification.Builder(getApplicationContext())
-                        .setContentTitle("interactive title " + "centre")
-                        .setSmallIcon(R.drawable.ic_launcher_share)
-                        .setContentText("interactive text " + "centre")
-                        .setContentIntent(pendingIntent)
-                        .build();
-                mNotificationManager.notify(0, notification);
-                return true;
-            case KeyEvent.KEYCODE_DPAD_CENTER:
-                // Somehow disabled in Google Map
 
-                return true;
-            case KeyEvent.KEYCODE_DPAD_DOWN:
-                Log.d("ERWear", "DPAD DOWN" + (ERWearConsoleLinearLayout.getAlpha()));
-                ERWearConsoleLinearLayout.setVisibility(View.VISIBLE);
-                if(ERWearConsoleLinearLayout.getAlpha()==0.1f){
-                    ERWearConsoleLinearLayout.startAnimation(fade_in);
-                    fade_in.setFillAfter(true);
-                    ERWearConsoleLinearLayout.setAlpha(1.0f);
-                }
-                return true;
-            case KeyEvent.KEYCODE_DPAD_UP:
-                Log.d("ERWear", "DPAD UP" + ERWearConsoleLinearLayout.getAlpha());
-                ERWearConsoleLinearLayout.setVisibility(View.VISIBLE);
-                if(ERWearConsoleLinearLayout.getAlpha()==1.0f){
-
-                    ERWearConsoleLinearLayout.startAnimation(fade_out);
-                    fade_out.setFillAfter(true);
-                    //
-
-
-                }
-                return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -198,7 +158,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             socket = new SocketIO("http://192.168.1.73:3000/");
         }catch(MalformedURLException e){
             System.out.println(e.toString());
-            Log.e("ERWear Exception","Malformed URL Error");
+            Log.e(TAG+" Exception","Malformed URL Error");
         }
         // Socket IO Setup
         socket.connect(new IOCallback() {
@@ -211,7 +171,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
                 } catch (JSONException e) {
                     e.printStackTrace();
-                    System.out.println("OnMessage Json Exception: "+e.toString());
+                    System.out.println("OnMessage Json Exception: " + e.toString());
                 }
             }
 
@@ -239,11 +199,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
             @Override
             public void on(String event, IOAcknowledge ack, Object... args) {
                 System.out.println("Server triggered event '" + event + "'");
-                try{
-                    switch(event){
+                try {
+                    switch (event) {
                         case "POIUpdate":
                             System.out.println("POI Update YO! '" + event + "'");
-                            JSONObject data = (JSONObject)args[0];
+                            JSONObject data = (JSONObject) args[0];
                             System.out.println(data.getString("description"));
                             Notification notification = new Notification.Builder(getApplicationContext())
                                     .setContentTitle("POI Update")
@@ -253,8 +213,8 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                             mNotificationManager.notify(0, notification);
                             break;
                     }
-                }catch(JSONException e){
-                    Log.e("ERWear", e.toString());
+                } catch (JSONException e) {
+                    Log.e(TAG, e.toString());
                 }
 
             }
@@ -272,7 +232,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
 
 
         LatLng current_location = new LatLng(51.071099, -114.128332);
-        Log.d("ERWear", "!!" + current_location.toString());
+        Log.d(TAG, "!!" + current_location.toString());
         mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
@@ -283,7 +243,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         LatLng sydney = new LatLng(-34, 151);
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));*/
-        Log.d("ERWear", "MapReady");
+        Log.d(TAG, "MapReady");
         // Acquire a reference to the system Location Manager
         /*LocationManager locationManager = (LocationManager) this.getSystemService(getApplicationContext().LOCATION_SERVICE);
 
@@ -342,6 +302,56 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         {
             //if(startPressure != Float.MIN_VALUE){ CreateNotification(); }
             //startPressure = altitudePressure;
+        }
+    }
+
+
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
+        Log.v(TAG, "onKeyDown keyCode: " + keyCode);
+        switch(keyCode)
+        {
+            case KeyEvent.KEYCODE_DPAD_LEFT:
+                Log.d(TAG, "Left");
+                /*PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(Settings.ACTION_SETTINGS), 0);
+                Notification notification = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("interactive title " + "centre")
+                        .setSmallIcon(R.drawable.ic_launcher_share)
+                        .setContentText("interactive text " + "centre")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                mNotificationManager.notify(0, notification);*/
+                Intent CameraIntent = new Intent(getApplicationContext(), CameraActivity.class);
+                startActivity(CameraIntent);
+                return true;
+            case KeyEvent.KEYCODE_DPAD_CENTER:
+                // Somehow disabled in Google Map
+
+                return true;
+            case KeyEvent.KEYCODE_DPAD_DOWN:
+                hideERWearDashBoard();
+                return true;
+            case KeyEvent.KEYCODE_DPAD_UP:
+                showERWearDashBoard();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    public void hideERWearDashBoard(){
+        Log.d(TAG, "DPAD DOWN" + (ERWearConsoleLinearLayout.getAlpha()));
+        ERWearConsoleLinearLayout.setVisibility(View.VISIBLE);
+        if(ERWearConsoleLinearLayout.getAlpha()==0.1f){
+            ERWearConsoleLinearLayout.startAnimation(fade_in);
+            fade_in.setFillAfter(true);
+            ERWearConsoleLinearLayout.setAlpha(1.0f);
+        }
+    }
+    public void showERWearDashBoard(){
+        Log.d(TAG, "DPAD UP" + ERWearConsoleLinearLayout.getAlpha());
+        ERWearConsoleLinearLayout.setVisibility(View.VISIBLE);
+        if(ERWearConsoleLinearLayout.getAlpha()==1.0f){
+            ERWearConsoleLinearLayout.startAnimation(fade_out);
+            fade_out.setFillAfter(true);
         }
     }
 }
