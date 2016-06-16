@@ -231,11 +231,11 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap = googleMap;
 
 
-        LatLng current_location = new LatLng(51.071099, -114.128332);
-        Log.d(TAG, "!!" + current_location.toString());
-        mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
+        //LatLng current_location = new LatLng(51.071099, -114.128332);
+        //Log.d(TAG, "!!" + current_location.toString());
+        //mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
+        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
 
 
         // Add a marker in Sydney, Australia, and move the camera.
@@ -245,7 +245,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));*/
         Log.d(TAG, "MapReady");
         // Acquire a reference to the system Location Manager
-        /*LocationManager locationManager = (LocationManager) this.getSystemService(getApplicationContext().LOCATION_SERVICE);
+        LocationManager locationManager = (LocationManager) this.getSystemService(getApplicationContext().LOCATION_SERVICE);
 
 // Define a listener that responds to location updates
         LocationListener locationListener = new LocationListener() {
@@ -255,9 +255,9 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 //System.out.println("!!" + location.toString());
                 LatLng current_location = new LatLng(location.getLatitude(), location.getLongitude());
                 Log.d("ERWear","!!"+current_location.toString());
-                //mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
+                mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
                 //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 20));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -268,7 +268,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         };
 
 // Register the listener with the Location Manager to receive location updates
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);*/
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,3000, 0, locationListener);
     }
     public void onPause() {
         super.onPause();  // Always call the superclass method first
@@ -333,6 +333,19 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 return true;
             case KeyEvent.KEYCODE_DPAD_UP:
                 showERWearDashBoard();
+                return true;
+            case KeyEvent.KEYCODE_DPAD_RIGHT:
+                Intent NavIntent = new Intent(android.content.Intent.ACTION_VIEW,
+                        Uri.parse("google.navigation:q=51.0781632,-114.1379894"));
+                //startActivity(intent);
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, NavIntent , 0);
+                Notification notification = new Notification.Builder(getApplicationContext())
+                        .setContentTitle("Remote Navigation")
+                        .setSmallIcon(R.drawable.ic_launcher_share)
+                        .setContentText("Destination: lovelife")
+                        .setContentIntent(pendingIntent)
+                        .build();
+                mNotificationManager.notify(0, notification);
                 return true;
         }
         return super.onKeyDown(keyCode, event);

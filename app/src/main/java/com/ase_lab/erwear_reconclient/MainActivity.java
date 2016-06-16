@@ -8,6 +8,7 @@ import android.content.Intent;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 
 import com.reconinstruments.os.HUDOS;
 import com.reconinstruments.os.metrics.HUDMetricsID;
@@ -18,6 +19,7 @@ import android.view.KeyEvent;
 import android.media.AudioManager;
 
 
+import android.net.Uri;
 import io.socket.*;
 import org.json.*;
 
@@ -52,6 +54,8 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
         switch(keyCode)
         {
             case KeyEvent.KEYCODE_DPAD_LEFT:
+
+
 
                 return true;
             case KeyEvent.KEYCODE_DPAD_CENTER:

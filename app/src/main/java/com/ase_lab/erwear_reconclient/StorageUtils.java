@@ -103,7 +103,6 @@ public class StorageUtils {
                 Map<String, String> params = new HashMap<String, String>(2);
                 //params.put("foo", hash);
                 //params.put("bar", caption);
-
                 //String result = multipartRequest(URL_UPLOAD_VIDEO, params, finalName, "video", "video/mp4");
             }
 
@@ -235,7 +234,7 @@ public class StorageUtils {
             Log.e(UploadTag ,e.toString());
             //throw new CustomException(e);
         }
-
+        return result;
     }
 
     private static String convertStreamToString(InputStream is) {
