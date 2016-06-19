@@ -74,6 +74,9 @@ public class MainActivity extends SimpleListActivity implements MetricsValueChan
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        Intent mapIntent = new Intent(getApplicationContext(), MapActivity.class);
+        startActivity(mapIntent);
+
         setContentView(R.layout.activity_main);
 
         altitudeTextView = (TextView) findViewById(R.id.altitudeTextView);

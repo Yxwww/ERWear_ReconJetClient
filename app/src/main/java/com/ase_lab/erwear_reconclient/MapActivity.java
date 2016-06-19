@@ -14,6 +14,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Notification;
@@ -212,6 +213,23 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                                     .build();
                             mNotificationManager.notify(0, notification);
                             break;
+                        case "remoteNavigation":
+                            System.out.println(event+" ");
+                            JSONObject navData = (JSONObject) args[0];
+                            //startActivity(intent);
+                            String lat = navData.getJSONObject("payload").getString("lat");
+                            String lng = navData.getJSONObject("payload").getString("lng");
+                            Intent NavIntent = new Intent(android.content.Intent.ACTION_VIEW,
+                                    Uri.parse("google.navigation:q="+lat+","+lng+""));
+                            PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, NavIntent , 0);
+                            Notification remoteNavNotification = new Notification.Builder(getApplicationContext())
+                                    .setContentTitle("Remote Navigation Request")
+                                    .setSmallIcon(R.drawable.ic_launcher_share)
+                                    .setContentText("Destination: "+lat+","+lng)
+                                    .setContentIntent(pendingIntent)
+                                    .build();
+                            mNotificationManager.notify(0, remoteNavNotification);
+                            break;
                     }
                 } catch (JSONException e) {
                     Log.e(TAG, e.toString());
@@ -224,40 +242,27 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         socket.send("Hello Server!");
     }
 
-
-
+    //MarkerOptions userMarker = new MarkerOptions().position(new LatLng(51.048093, -114.071201)).title("User");
+    Marker userMarker = null;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-
-        //LatLng current_location = new LatLng(51.071099, -114.128332);
-        //Log.d(TAG, "!!" + current_location.toString());
-        //mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
-        //mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
-
-
-        // Add a marker in Sydney, Australia, and move the camera.
-        /*Log.d("ERWear","MapReady");
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, 15));*/
+        userMarker = mMap.addMarker(new MarkerOptions().position(new LatLng(51.048093, -114.071201))
+                .title(""));
         Log.d(TAG, "MapReady");
         // Acquire a reference to the system Location Manager
         LocationManager locationManager = (LocationManager) this.getSystemService(getApplicationContext().LOCATION_SERVICE);
 
-// Define a listener that responds to location updates
+        // Define a listener that responds to location updates
+        final SocketIO SoDSocket = this.socket;
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
-                // Called when a new location is found by the gps location provider.
-                //makeUseOfNewLocation(location);
-                //System.out.println("!!" + location.toString());
                 LatLng current_location = new LatLng(location.getLatitude(), location.getLongitude());
-                Log.d("ERWear","!!"+current_location.toString());
-                mMap.addMarker(new MarkerOptions().position(current_location).title("You"));
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(current_location));
+                Log.d("ERWear", "!!" + current_location.toString());
+                userMarker.setPosition(current_location);
                 mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(current_location, 15));
+                //
+                socket.emit("updateERLocation", current_location.latitude + "," + current_location.longitude);
             }
 
             public void onStatusChanged(String provider, int status, Bundle extras) {}
@@ -313,14 +318,6 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
         {
             case KeyEvent.KEYCODE_DPAD_LEFT:
                 Log.d(TAG, "Left");
-                /*PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, new Intent(Settings.ACTION_SETTINGS), 0);
-                Notification notification = new Notification.Builder(getApplicationContext())
-                        .setContentTitle("interactive title " + "centre")
-                        .setSmallIcon(R.drawable.ic_launcher_share)
-                        .setContentText("interactive text " + "centre")
-                        .setContentIntent(pendingIntent)
-                        .build();
-                mNotificationManager.notify(0, notification);*/
                 Intent CameraIntent = new Intent(getApplicationContext(), CameraActivity.class);
                 startActivity(CameraIntent);
                 return true;
@@ -335,17 +332,7 @@ public class MapActivity extends FragmentActivity implements OnMapReadyCallback,
                 showERWearDashBoard();
                 return true;
             case KeyEvent.KEYCODE_DPAD_RIGHT:
-                Intent NavIntent = new Intent(android.content.Intent.ACTION_VIEW,
-                        Uri.parse("google.navigation:q=51.0781632,-114.1379894"));
-                //startActivity(intent);
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, NavIntent , 0);
-                Notification notification = new Notification.Builder(getApplicationContext())
-                        .setContentTitle("Remote Navigation")
-                        .setSmallIcon(R.drawable.ic_launcher_share)
-                        .setContentText("Destination: lovelife")
-                        .setContentIntent(pendingIntent)
-                        .build();
-                mNotificationManager.notify(0, notification);
+
                 return true;
         }
         return super.onKeyDown(keyCode, event);
